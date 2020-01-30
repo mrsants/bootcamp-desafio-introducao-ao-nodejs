@@ -7,9 +7,11 @@ const app = express();
 app.use(express.json());
 
 const projects = [
-    { id: 0, name: "Angular" },
-    { id: 1, name: "React" },
-    { id: 2, name: "Reactive Native" }
+    {
+        id: 1,
+        title: 'react',
+        tasks: []
+    }
 ];
 
 app.use((req, res, next) => {
@@ -22,20 +24,21 @@ app.use((req, res, next) => {
     count++;
 });
 
-const checkByIdBody = (req, res, next) => {
-    const { id } = req.body;
-    console.log(id);
-    if (projects.find(project => project.id === parseInt(id))) {
-      return res.status(400).json({ error: 'Project id already exists' })
+function checkExists(req, res, next) {
+    const { id } = req.params;
+    const project = projects.find(p => p.id == id);
+
+    if (!project) {
+        return res.status(400).json({ error: 'Project not found' });
     }
+
     return next();
-};
+}
 
 const checkById = (req, res, next) => {
     const { id } = req.params;
-    const auxVal = projects.findIndex(project => project.id === parseInt(id));
-    if (auxVal < 0) {
-      return res.status(401).json({ error: 'project id not exists' })
+    if (projects.find(project => project.id === parseInt(id))) {
+        return res.status(400).json({ error: 'Project id already exists' })
     }
     return next();
 };
@@ -49,15 +52,63 @@ app.get('/projects/:id', checkById, (req, res) => {
     return res.json(project);
 });
 
-app.post('/projects', checkByIdBody, (req, res) => {
-    const { id, name } = req.body;
-    const project = {
-      id,
-      name
+function validateExistsArray(req, res, next) {
+    const { id } = req.body;
+
+    let index = projects.findIndex(project => project.id == id);
+
+    if (index >= 0) {
+        return res.status(400).json({
+            error: 'project already exists'
+        });
+    }
+    return next();
+}
+
+app.post('/projects', validateExistsArray, (req, res) => {
+    const { id, title } = req.body;
+
+    const newProject = {
+        id,
+        title,
+        tasks: []
     };
-    projects.push(project);
-  
-    return res.json(projects);
+
+    projects.push(newProject);
+    return res.status(201).json({
+        message: 'project create success'
+    });
 });
 
+app.put('/projects/:id', checkExists, (req, res) => {
+    const { id } = req.params;
+    const { title } = req.body;
+
+    const project = projects.find(p => p.id == id);
+
+    project.title = title;
+
+    return res.json(project);
+});
+
+app.delete('/projects/:id', checkExists, (req, res) => {
+    const { id } = req.params;
+
+    const projectIndex = projects.findIndex(p => p.id == id);
+
+    projects.splice(projectIndex, 1);
+
+    return res.send();
+});
+
+app.post('/projects/:id/tasks', checkExists, (req, res) => {
+    const { id } = req.params;
+    const { title } = req.body;
+
+    const project = projects.find(p => p.id == id);
+
+    project.tasks.push(title);
+
+    return res.json(project);
+});
 app.listen(3002);
