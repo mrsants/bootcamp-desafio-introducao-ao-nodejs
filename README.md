@@ -6,12 +6,6 @@
   Desafio 1: Conceitos do NodeJS
 </h3>
 
-## :rocket: Sobre o desafio
-
-<p align="center">
-  <a href="https://github.com/Rocketseat/bootcamp-gostack-desafio-01/edit/master/README.md">Sobre o desafio</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
-</p>
-
 ### Rotas
 
 - `POST /projects`
@@ -37,5 +31,7 @@ retorno obtido no desafio
   }
 ];
 ```
+
+Sobre o desafio: (https://github.com/Rocketseat/bootcamp-gostack-desafio-01/edit/master/README.md)
 
 
